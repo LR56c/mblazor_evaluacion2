@@ -1,0 +1,11 @@
+D:\dev\Iplacex\multiplataforma\mblazor_evaluacion2\shared\bin\Debug\net8.0\shared.deps.json
+D:\dev\Iplacex\multiplataforma\mblazor_evaluacion2\shared\bin\Debug\net8.0\shared.dll
+D:\dev\Iplacex\multiplataforma\mblazor_evaluacion2\shared\bin\Debug\net8.0\shared.pdb
+D:\dev\Iplacex\multiplataforma\mblazor_evaluacion2\shared\obj\Debug\net8.0\shared.GeneratedMSBuildEditorConfig.editorconfig
+D:\dev\Iplacex\multiplataforma\mblazor_evaluacion2\shared\obj\Debug\net8.0\shared.AssemblyInfoInputs.cache
+D:\dev\Iplacex\multiplataforma\mblazor_evaluacion2\shared\obj\Debug\net8.0\shared.AssemblyInfo.cs
+D:\dev\Iplacex\multiplataforma\mblazor_evaluacion2\shared\obj\Debug\net8.0\shared.csproj.CoreCompileInputs.cache
+D:\dev\Iplacex\multiplataforma\mblazor_evaluacion2\shared\obj\Debug\net8.0\shared.dll
+D:\dev\Iplacex\multiplataforma\mblazor_evaluacion2\shared\obj\Debug\net8.0\refint\shared.dll
+D:\dev\Iplacex\multiplataforma\mblazor_evaluacion2\shared\obj\Debug\net8.0\shared.pdb
+D:\dev\Iplacex\multiplataforma\mblazor_evaluacion2\shared\obj\Debug\net8.0\ref\shared.dll

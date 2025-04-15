@@ -1,0 +1,24 @@
+﻿@page "/"
+@inject HttpClient Http
+@rendermode InteractiveWebAssembly
+
+<PageTitle>Counter</PageTitle>
+Estado de la conexión
+<p>@conexionServidor</p>
+<button class="btn btn-primary">Click me</button>
+
+@code {
+    string url = "https://localhost:44343/";
+    string conexionServidor = "Conectando..";
+    
+    async Task ProbarConexion()
+    {
+        var respuesta = await Http.GetStringAsync(url + "api/Product/connection");
+        conexionServidor = respuesta;
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await ProbarConexion();
+    }
+}
