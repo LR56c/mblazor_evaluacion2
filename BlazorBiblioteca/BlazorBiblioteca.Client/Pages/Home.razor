@@ -1,0 +1,164 @@
+﻿@page "/"
+@using BlazorBiblioteca.Shared
+@inject HttpClient Http
+
+<PageTitle>Libros</PageTitle>
+Estado de la conexión
+<p>@conexionServidor</p>
+<p>@conexionLibros</p>
+<h2>FORMULARIO</h2>
+<div>
+    <EditForm Model="@libro" OnValidSubmit="CreateOrUpdateLibro" FormName="createOrUpdate">
+        <DataAnnotationsValidator />
+
+        <label for="nombre">Nombre libro:</label>
+        <InputText id="nombre" @bind-Value=libro!.NombreLibro></InputText>
+        <ValidationMessage For="@(() => libro.NombreLibro)" />
+
+        <label for="autor">Autor libro:</label>
+        <InputText id="autor" @bind-Value=libro!.Autor></InputText>
+        <ValidationMessage For="@(() => libro.Autor)" />
+
+        <label for="num">Numero de paginas</label>
+        <InputNumber id="num" TValue="int" @bind-Value=libro.NumPaginas></InputNumber>
+        <ValidationMessage For="@(() => libro.NumPaginas)" />
+
+        <label for="fecha">Fecha de Publicacion:</label>
+        <InputDate id="fecha" @bind-Value=libro!.FechaPublicacion></InputDate>
+
+        <button type="submit">Guardar libro</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <p><strong>@message</strong></p>
+    }
+
+    <div class="column">
+            @if(libros.Count == 0){ <h3>No existen libros en la biblioteca actualmente. @message </h3> }
+            else
+            {
+                <p><strong>LISTADO LIBROS</strong></p>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Nombre</th>
+                            <th>Autor</th>
+                            <th>Numero Paginas</th>
+                            <th>Fecha Publicacion</th>
+                            <th>Actualizar</th>
+                            <th>Eliminar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var libro in libros)
+                        {
+                            <tr @key="libro.Id">
+                                <td>@libro.Id</td>
+                                <td>@libro.NombreLibro</td>
+                                <td>@libro.Autor</td>
+                                <td>@libro.NumPaginas</td>
+                                <td>@libro.FechaPublicacion</td>
+                                <td><button @onclick="() => this.libro = libro">Actualizar</button></td>
+                                <td><button @onclick="() => DeleteLibro(libro.Id)">Eliminar</button></td> 
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+    </div>
+</div>
+
+@code {
+    string url = "https://localhost:7227/";
+    string conexionServidor = "Conectando..";
+    string conexionLibros = "Conectando..";
+
+    async Task ProbarConexion()
+    {
+        var respuesta = await Http.GetStringAsync(url + "api/Libro/ConexionServidor");
+        conexionServidor = respuesta;
+
+        var respuestaLibros = await Http.GetStringAsync(url + "api/Libro/ConexionLibros");
+        conexionLibros = respuestaLibros;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ProbarConexion();
+        await GetLibros();
+    }
+
+    string message = string.Empty;
+    List<Libro> libros = new List<Libro>();
+
+    [SupplyParameterFromForm(FormName = "createOrUpdate")]
+    Libro libro { get; set; } = new();
+
+    async Task GetLibros()
+    {
+        try
+        {
+            var movies = await Http.GetFromJsonAsync<List<Libro>>(url + "api/Libro/LibrosListar");
+            libros = movies;
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
+    }
+
+    async Task CreateOrUpdateLibro()
+    {
+        if (libro.Id == 0)
+            await CreateLibro();
+        else
+            await UpdateLibro();
+    }
+
+    async Task CreateLibro()
+    {
+        var res = await Http.PostAsJsonAsync(url + "api/Libro/LibroAgregar", libro);
+
+        if (res.IsSuccessStatusCode)
+        {
+            message = "Se ha ingresado un nuevo libro en la Biblioteca";
+            libro = new();
+        }
+        else
+        {
+            message = "Error al ingresar nuevo Libro";
+        }
+
+        await GetLibros();
+    }
+
+    async Task UpdateLibro()
+    {
+        var res = await Http.PutAsJsonAsync<Libro>(url + "api/Libro/libro/" + libro.Id, libro);
+
+        if (res.IsSuccessStatusCode) message = $"Se ha actualizado el Libro {libro.NombreLibro}";
+        else message = $"Error al actualizar Libro {libro.NombreLibro}";
+
+        libro = new();
+
+        await GetLibros();
+    }
+
+    async Task DeleteLibro(int id)
+    {
+        var res = await Http.DeleteAsync(url + $"api/Libro/libro/{id}");
+
+        if (res.IsSuccessStatusCode)
+        {
+            message = "Libro eliminado correctamente";
+            await GetLibros();
+        }
+        else
+        {
+            message = "Error al eliminar libro";
+        }
+    }
+
+}
