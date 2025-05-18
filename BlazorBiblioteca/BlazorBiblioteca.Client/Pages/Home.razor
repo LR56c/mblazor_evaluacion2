@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using BlazorBootstrap
 @using BlazorBiblioteca.Shared
 @inject HttpClient Http
 
@@ -9,64 +10,78 @@ Estado de la conexión
 <h2>FORMULARIO</h2>
 <div>
     <EditForm Model="@libro" OnValidSubmit="CreateOrUpdateLibro" FormName="createOrUpdate">
-        <DataAnnotationsValidator />
+        <DataAnnotationsValidator/>
 
         <label for="nombre">Nombre libro:</label>
-        <InputText id="nombre" @bind-Value=libro!.NombreLibro></InputText>
-        <ValidationMessage For="@(() => libro.NombreLibro)" />
+        <TextInput Id="nombre" @bind-Value="libro!.NombreLibro"/>
+        <ValidationMessage For="@(() => libro.NombreLibro)"/>
 
         <label for="autor">Autor libro:</label>
-        <InputText id="autor" @bind-Value=libro!.Autor></InputText>
-        <ValidationMessage For="@(() => libro.Autor)" />
+        <TextInput Id="autor" @bind-Value="libro!.Autor"/>
+        <ValidationMessage For="@(() => libro.Autor)"/>
 
         <label for="num">Numero de paginas</label>
-        <InputNumber id="num" TValue="int" @bind-Value=libro.NumPaginas></InputNumber>
-        <ValidationMessage For="@(() => libro.NumPaginas)" />
+        <NumberInput id="num" TValue="int" @bind-Value="libro.NumPaginas"/>
+        <ValidationMessage For="@(() => libro.NumPaginas)"/>
 
         <label for="fecha">Fecha de Publicacion:</label>
-        <InputDate id="fecha" @bind-Value=libro!.FechaPublicacion></InputDate>
-
-        <button type="submit">Guardar libro</button>
+        <DateInput id="fecha" TValue="DateTime" @bind-Value="libro.FechaPublicacion"/>
+        <Button Size="ButtonSize.Large" Type="ButtonType.Submit" Color="ButtonColor.Success"> Guardar libro</Button>
     </EditForm>
 
-    @if (!string.IsNullOrEmpty(message))
+    @if (message.Contains("actualizado"))
     {
-        <p><strong>@message</strong></p>
+        <Alert Color="AlertColor.Warning"> @message </Alert>
     }
-
+    else if (message.Contains("ingresado"))
+    {
+        <Alert Color="AlertColor.Success"> @message </Alert>
+    }
+    else if (!string.IsNullOrEmpty(message))
+    {
+        <Alert Color="AlertColor.Danger"> @message </Alert>
+    }
+    
     <div class="column">
-            @if(libros.Count == 0){ <h3>No existen libros en la biblioteca actualmente. @message </h3> }
-            else
-            {
-                <p><strong>LISTADO LIBROS</strong></p>
-                <table border="1">
-                    <thead>
-                        <tr>
-                            <th>Id</th>
-                            <th>Nombre</th>
-                            <th>Autor</th>
-                            <th>Numero Paginas</th>
-                            <th>Fecha Publicacion</th>
-                            <th>Actualizar</th>
-                            <th>Eliminar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var libro in libros)
-                        {
-                            <tr @key="libro.Id">
-                                <td>@libro.Id</td>
-                                <td>@libro.NombreLibro</td>
-                                <td>@libro.Autor</td>
-                                <td>@libro.NumPaginas</td>
-                                <td>@libro.FechaPublicacion</td>
-                                <td><button @onclick="() => this.libro = libro">Actualizar</button></td>
-                                <td><button @onclick="() => DeleteLibro(libro.Id)">Eliminar</button></td> 
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
+        @if (libros.Count == 0)
+        {
+            <h3>No existen libros en la biblioteca actualmente. @message </h3>
+        }
+        else
+        {
+            <p><strong>LISTADO LIBROS</strong></p>
+            <table border="1">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Autor</th>
+                    <th>Numero Paginas</th>
+                    <th>Fecha Publicacion</th>
+                    <th>Actualizar</th>
+                    <th>Eliminar</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var libro in libros)
+                {
+                    <tr @key="libro.Id">
+                        <td>@libro.Id</td>
+                        <td>@libro.NombreLibro</td>
+                        <td>@libro.Autor</td>
+                        <td>@libro.NumPaginas</td>
+                        <td>@libro.FechaPublicacion</td>
+                        <td>
+                            <Button @onclick="() => this.libro = libro" Size="ButtonSize.Medium" Color="ButtonColor.Warning"> Actualizar </Button>
+                        </td>
+                        <td>
+                            <Button @onclick="() => DeleteLibro(libro.Id)" Size="ButtonSize.Medium" Color="ButtonColor.Danger"> Eliminar </Button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
     </div>
 </div>
 
@@ -74,7 +89,6 @@ Estado de la conexión
     string url = "https://localhost:7227/";
     string conexionServidor = "Conectando..";
     string conexionLibros = "Conectando..";
-
     async Task ProbarConexion()
     {
         var respuesta = await Http.GetStringAsync(url + "api/Libro/ConexionServidor");
